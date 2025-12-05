@@ -59,6 +59,13 @@ const {  getIncomes,  addIncome,  updateIncome,  deleteIncome, getIncomesByDate}
 const {  getExpenses,  addExpense,  updateExpense,  deleteExpense, getExpensesByDate} = require("../controllers/otherExpenseController");
 const { getPrinters, upsertPrinter, deletePrinter } = require("../controllers/printerController");
 
+const {
+  getComponents,
+  createComponent,
+  updateComponent,
+  deleteComponent
+} = require("../controllers/level1ComponentController");
+
 // Only admin can manage printers (adjust roles as needed)
 router.get("/printers", authMiddleware(["admin", "kitchen", "cashier"]), getPrinters);
 router.post("/printers", authMiddleware(["admin", "kitchen", "cashier"]), upsertPrinter);
@@ -210,5 +217,10 @@ router.post("/expense/other/", authMiddleware(["admin", "cashier"]), addExpense)
 router.put("/expense/other/:id", authMiddleware(["admin", "cashier"]), updateExpense);
 router.delete("/expense/other/:id", authMiddleware(["admin", "cashier"]), deleteExpense);
 router.get("/expense/other/by-date", authMiddleware(["admin", "cashier"]), getExpensesByDate);
+
+router.get("/", authMiddleware(["admin", "user"]), getComponents);
+router.post("/", authMiddleware(["admin", "user"]),createComponent);
+router.put("/:id", authMiddleware(["admin", "user"]), updateComponent);
+router.delete("/:id", authMiddleware(["admin", "user"]),deleteComponent);
 
 module.exports = router;
