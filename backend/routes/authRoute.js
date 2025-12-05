@@ -59,22 +59,9 @@ const {  getIncomes,  addIncome,  updateIncome,  deleteIncome, getIncomesByDate}
 const {  getExpenses,  addExpense,  updateExpense,  deleteExpense, getExpensesByDate} = require("../controllers/otherExpenseController");
 const { getPrinters, upsertPrinter, deletePrinter } = require("../controllers/printerController");
 
-const {
-  getComponents,
-  createComponent,
-  updateComponent,
-  deleteComponent
-} = require("../controllers/level1ComponentController");
-
+const level1componentcontroller = require('../controllers/level1ComponentController');
 const level2componentcontroller = require('../controllers/level2ComponentController');
-
-const {
-  getlevel3Components,
-  getlevel3ParentComponents,
-  createlevel3Component,
-  updatelevel3Component,
-  deletelevel3Component
-} = require('../controllers/level3ComponentController');
+const level3componentcontroller = require('../controllers/level3ComponentController');
 
 // Only admin can manage printers (adjust roles as needed)
 router.get("/printers", authMiddleware(["admin", "kitchen", "cashier"]), getPrinters);
@@ -228,10 +215,10 @@ router.put("/expense/other/:id", authMiddleware(["admin", "cashier"]), updateExp
 router.delete("/expense/other/:id", authMiddleware(["admin", "cashier"]), deleteExpense);
 router.get("/expense/other/by-date", authMiddleware(["admin", "cashier"]), getExpensesByDate);
 
-router.get("/level1component/", authMiddleware(["admin", "user"]), getComponents);
-router.post("/level1component/", authMiddleware(["admin", "user"]),createComponent);
-router.put("/level1component/:id", authMiddleware(["admin", "user"]), updateComponent);
-router.delete("/level1component/:id", authMiddleware(["admin", "user"]),deleteComponent);
+router.get("/level1component/", authMiddleware(["admin", "user"]), level1componentcontroller.getComponents);
+router.post("/level1component/", authMiddleware(["admin", "user"]), level1componentcontroller.createComponent);
+router.put("/level1component/:id", authMiddleware(["admin", "user"]), level1componentcontroller.updateComponent);
+router.delete("/level1component/:id", authMiddleware(["admin", "user"]), level1componentcontroller.deleteComponent);
 
 router.get('/level2component/', authMiddleware(["admin", "user"]), level2componentcontroller.getComponents); // all Level2
 router.get('/level2component/parents', authMiddleware(["admin", "user"]), level2componentcontroller.getParentComponents); // just Level1 list
@@ -239,10 +226,10 @@ router.post('/level2component/', authMiddleware(["admin", "user"]), level2compon
 router.put('/level2component/:id', authMiddleware(["admin", "user"]), level2componentcontroller.updateComponent);
 router.delete('/level2component/:id', authMiddleware(["admin", "user"]), level2componentcontroller.deleteComponent);
 
-router.get('/level3component/', authMiddleware(["admin", "user"]), getlevel3Components);
-router.get('/level3component/parents', authMiddleware(["admin", "user"]), getlevel3ParentComponents);
-router.post('/level3component/', authMiddleware(["admin", "user"]), createlevel3Component);
-router.put('/level3component/:id', authMiddleware(["admin", "user"]), updatelevel3Component);
-router.delete('/level3component/:id', authMiddleware(["admin", "user"]), deletelevel3Component);
+router.get('/level3component/', authMiddleware(["admin", "user"]), level3componentcontroller.getComponents);
+router.get('/level3component/parents', authMiddleware(["admin", "user"]), level3componentcontroller.getParentComponents);
+router.post('/level3component/', authMiddleware(["admin", "user"]), level3componentcontroller.createComponent);
+router.put('/level3component/:id', authMiddleware(["admin", "user"]), level3componentcontroller.updateComponent);
+router.delete('/level3component/:id', authMiddleware(["admin", "user"]), level3componentcontroller.deleteComponent);
 
 module.exports = router;
