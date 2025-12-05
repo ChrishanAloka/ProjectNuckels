@@ -66,6 +66,8 @@ const {
   deleteComponent
 } = require("../controllers/level1ComponentController");
 
+const level2componentcontroller = require('../controllers/level2ComponentController');
+
 // Only admin can manage printers (adjust roles as needed)
 router.get("/printers", authMiddleware(["admin", "kitchen", "cashier"]), getPrinters);
 router.post("/printers", authMiddleware(["admin", "kitchen", "cashier"]), upsertPrinter);
@@ -222,5 +224,11 @@ router.get("/level1component/", authMiddleware(["admin", "user"]), getComponents
 router.post("/level1component/", authMiddleware(["admin", "user"]),createComponent);
 router.put("/level1component/:id", authMiddleware(["admin", "user"]), updateComponent);
 router.delete("/level1component/:id", authMiddleware(["admin", "user"]),deleteComponent);
+
+router.get('/level2component/', authMiddleware(["admin", "user"]), level2componentcontroller.getComponents); // all Level2
+router.get('/level2component/parents', authMiddleware(["admin", "user"]), level2componentcontroller.getParentComponents); // just Level1 list
+router.post('/level2component/', authMiddleware(["admin", "user"]), level2componentcontroller.createComponent);
+router.put('/level2component/:id', authMiddleware(["admin", "user"]), level2componentcontroller.updateComponent);
+router.delete('/level2component/:id', authMiddleware(["admin", "user"]), level2componentcontroller.deleteComponent);
 
 module.exports = router;
