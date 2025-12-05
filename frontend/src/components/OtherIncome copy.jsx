@@ -1,63 +1,63 @@
-// src/components/OtherExpenses.jsx
+// src/components/OtherIncome.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const OtherExpenses = () => {
-  const [expenses, setExpenses] = useState([]);
-  const [newExpense, setNewExpense] = useState({
-    category: "Marketing",
+const OtherIncome = () => {
+  const [incomes, setIncomes] = useState([]);
+  const [newIncome, setNewIncome] = useState({
+    source: "Tips",
     amount: "",
     description: "",
     date: new Date().toISOString().split("T")[0],
     paymentMethod: "Cash"
   });
 
-  const [editingExpense, setEditingExpense] = useState(null);
-  const [editData, setEditData] = useState({ ...newExpense });
+  const [editingIncome, setEditingIncome] = useState(null);
+  const [editData, setEditData] = useState({ ...newIncome });
   const [loading, setLoading] = useState(false);
 
-  // Load all expenses on mount
+  // Load all incomes on mount
   useEffect(() => {
-    fetchExpenses();
+    fetchIncomes();
   }, []);
 
-  const fetchExpenses = async () => {
+  const fetchIncomes = async () => {
     const token = localStorage.getItem("token");
 
     try {
-      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/expense/other", {
+      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/income/other", {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setExpenses(res.data);
+      setIncomes(res.data);
     } catch (err) {
-      console.error("Failed to load expenses:", err.message);
-      toast.error("Failed to load other expenses");
+      console.error("Failed to load incomes:", err.message);
+      toast.error("Failed to load other income records");
     }
   };
 
   // Handle form input change
   const handleChange = (e) =>
-    setNewExpense({ ...newExpense, [e.target.name]: e.target.value });
+    setNewIncome({ ...newIncome, [e.target.name]: e.target.value });
 
-  // Submit new expense
+  // Submit new income
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { category, amount, date } = newExpense;
+    const { source, amount, date } = newIncome;
 
-    if (!category || !amount || !date) {
-      alert("Category, Amount, and Date are required");
+    if (!source || !amount || !date) {
+      alert("Source, Amount, and Date are required");
       return;
     }
 
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "https://projectnuckels.onrender.com/api/auth/expense/other",
-        newExpense,
+        "https://projectnuckels.onrender.com/api/auth/income/other",
+        newIncome,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -65,19 +65,19 @@ const OtherExpenses = () => {
         }
       );
 
-      setExpenses([res.data, ...expenses]);
-      setNewExpense({
-        category: "Marketing",
+      setIncomes([res.data, ...incomes]);
+      setNewIncome({
+        source: "Tips",
         amount: "",
         description: "",
         date: new Date().toISOString().split("T")[0],
         paymentMethod: "Cash"
       });
 
-      toast.success("Expense added successfully!");
+      toast.success("Income added successfully!");
     } catch (err) {
       console.error("Add failed:", err.response?.data || err.message);
-      toast.error("Failed to add expense");
+      toast.error("Failed to add income");
     }
   };
 
@@ -85,14 +85,14 @@ const OtherExpenses = () => {
   const symbol = localStorage.getItem("currencySymbol") || "$";
 
   // Open edit modal
-  const openEditModal = (expense) => {
-    setEditingExpense(expense._id);
+  const openEditModal = (income) => {
+    setEditingIncome(income._id);
     setEditData({
-      category: expense.category,
-      amount: expense.amount,
-      description: expense.description,
-      date: new Date(expense.date).toISOString().split("T")[0],
-      paymentMethod: expense.paymentMethod || "Cash"
+      source: income.source,
+      amount: income.amount,
+      description: income.description,
+      date: new Date(income.date).toISOString().split("T")[0],
+      paymentMethod: income.paymentMethod || "Cash"
     });
   };
 
@@ -100,13 +100,13 @@ const OtherExpenses = () => {
   const handleEditChange = (e) =>
     setEditData({ ...editData, [e.target.name]: e.target.value });
 
-  // Save updated expense
+  // Save updated income
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    const { category, amount, date } = editData;
+    const { source, amount, date } = editData;
 
-    if (!category || !amount || !date) {
+    if (!source || !amount || !date) {
       alert("All fields are required");
       return;
     }
@@ -114,61 +114,61 @@ const OtherExpenses = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `https://projectnuckels.onrender.com/api/auth/expense/other/${editingExpense}`,
+        `https://projectnuckels.onrender.com/api/auth/income/other/${editingIncome}`,
         editData,
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
 
-      setExpenses(expenses.map((e) => (e._id === editingExpense ? res.data : e)));
-      setEditingExpense(null);
-      toast.success("Expense updated!");
+      setIncomes(incomes.map((i) => (i._id === editingIncome ? res.data : i)));
+      setEditingIncome(null);
+      toast.success("Income updated!");
     } catch (err) {
       console.error("Update failed:", err.response?.data || err.message);
-      toast.error("Failed to update expense");
+      toast.error("Failed to update income");
     }
   };
 
-  // Delete an expense
+  // Delete an income
   const handleDelete = async (id) => {
-    const confirmDelete = window.confirm("Are you sure you want to delete this expense?");
+    const confirmDelete = window.confirm("Are you sure you want to delete this income record?");
     if (!confirmDelete) return;
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://projectnuckels.onrender.com/api/auth/expense/other/${id}`, {
+      await axios.delete(`https://projectnuckels.onrender.com/api/auth/income/other/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setExpenses(expenses.filter((expense) => expense._id !== id));
-      toast.success("Expense deleted");
+      setIncomes(incomes.filter((income) => income._id !== id));
+      toast.success("Income record deleted");
     } catch (err) {
       console.error("Delete failed:", err.response?.data || err.message);
-      toast.error("Failed to delete expense");
+      toast.error("Failed to delete income record");
     }
   };
 
   return (
     <div className="container py-4">
-      <h2 className="mb-4 fw-bold text-danger border-bottom pb-2">Other Expenses</h2>
+      <h2 className="mb-4 fw-bold text-success border-bottom pb-2">Other Income</h2>
 
-      {/* Add Expense Form */}
+      {/* Add Income Form */}
       <form onSubmit={handleSubmit} className="p-4 bg-white border rounded shadow-sm mb-5">
         <div className="row g-3">
           <div className="col-md-6">
-            <label className="form-label fw-semibold">Expense Category</label>
+            <label className="form-label fw-semibold">Income Source</label>
             <select
-              name="category"
-              value={newExpense.category}
+              name="source"
+              value={newIncome.source}
               onChange={handleChange}
               className="form-select"
             >
-              <option>Marketing</option>
-              <option>Admin Supplies</option>
-              <option>Repairs & Maintenance</option>
-              <option>Software/Subscription</option>
-              <option>Training</option>
+              <option>Tips</option>
+              <option>Event Rental</option>
+              <option>Merchandise</option>
+              <option>Delivery Fee</option>
+              <option>Donations</option>
               <option>Other</option>
             </select>
           </div>
@@ -177,7 +177,7 @@ const OtherExpenses = () => {
             <input
               type="number"
               name="amount"
-              value={newExpense.amount}
+              value={newIncome.amount}
               onChange={handleChange}
               step="0.01"
               placeholder="e.g., 150"
@@ -189,7 +189,7 @@ const OtherExpenses = () => {
             <label className="form-label fw-semibold">Payment Method</label>
             <select
               name="paymentMethod"
-              value={newExpense.paymentMethod}
+              value={newIncome.paymentMethod}
               onChange={handleChange}
               className="form-select"
             >
@@ -206,7 +206,7 @@ const OtherExpenses = () => {
             <input
               type="date"
               name="date"
-              value={newExpense.date}
+              value={newIncome.date}
               onChange={handleChange}
               className="form-control"
               required
@@ -216,22 +216,22 @@ const OtherExpenses = () => {
             <label className="form-label fw-semibold">Description</label>
             <textarea
               name="description"
-              value={newExpense.description}
+              value={newIncome.description}
               onChange={handleChange}
               rows="2"
               className="form-control"
             />
           </div>
           <div className="col-12 mt-3">
-            <button type="submit" className="btn btn-danger w-100 py-2 fs-5">
-              + Add Expense
+            <button type="submit" className="btn btn-success w-100 py-2 fs-5">
+              + Add Income
             </button>
           </div>
         </div>
       </form>
 
       {/* Edit Modal */}
-      {editingExpense && (
+      {editingIncome && (
         <div
           className="modal fade show d-block"
           tabIndex="-1"
@@ -239,29 +239,29 @@ const OtherExpenses = () => {
         >
           <div className="modal-dialog">
             <div className="modal-content rounded shadow">
-              <div className="modal-header bg-danger text-white">
-                <h5 className="modal-title">Edit Expense</h5>
+              <div className="modal-header bg-success text-white">
+                <h5 className="modal-title">Edit Income</h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
-                  onClick={() => setEditingExpense(null)}
+                  onClick={() => setEditingIncome(null)}
                 />
               </div>
               <div className="modal-body">
                 <form onSubmit={handleUpdate}>
                   <div className="mb-3">
-                    <label className="form-label fw-semibold">Expense Category</label>
+                    <label className="form-label fw-semibold">Income Source</label>
                     <select
-                      name="category"
-                      value={editData.category}
+                      name="source"
+                      value={editData.source}
                       onChange={handleEditChange}
                       className="form-select"
                     >
-                      <option>Marketing</option>
-                      <option>Admin Supplies</option>
-                      <option>Repairs & Maintenance</option>
-                      <option>Software/Subscription</option>
-                      <option>Training</option>
+                      <option>Tips</option>
+                      <option>Event Rental</option>
+                      <option>Merchandise</option>
+                      <option>Delivery Fee</option>
+                      <option>Donations</option>
                       <option>Other</option>
                     </select>
                   </div>
@@ -315,13 +315,13 @@ const OtherExpenses = () => {
                     />
                   </div>
                   <div className="d-flex gap-2">
-                    <button type="submit" className="btn btn-danger w-100">
+                    <button type="submit" className="btn btn-success w-100">
                       Save Changes
                     </button>
                     <button
                       type="button"
-                      className="btn btn-secondary"
-                      onClick={() => handleDelete(editingExpense)}
+                      className="btn btn-danger"
+                      onClick={() => handleDelete(editingIncome)}
                     >
                       Delete
                     </button>
@@ -333,15 +333,15 @@ const OtherExpenses = () => {
         </div>
       )}
 
-      {/* Expenses Table */}
+      {/* Incomes Table */}
       <div className="mt-4">
-        <h4 className="mb-3 text-secondary">💸 Recent Expenses</h4>
+        <h4 className="mb-3 text-secondary">💰 Recent Income Records</h4>
         <div className="table-responsive shadow-sm rounded border">
           <table className="table table-bordered table-striped align-middle mb-0">
             <thead className="table-dark">
               <tr>
                 <th>Date</th>
-                <th>Category</th>
+                <th>Source</th>
                 <th>Amount</th>
                 <th>Payment Method</th>
                 <th>Description</th>
@@ -349,32 +349,32 @@ const OtherExpenses = () => {
               </tr>
             </thead>
             <tbody>
-              {expenses.length === 0 ? (
+              {incomes.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center text-muted py-4">
-                    No expenses found
+                    No income records found
                   </td>
                 </tr>
               ) : (
-                expenses.map(expense => (
-                  <tr key={expense._id}>
-                    <td>{new Date(expense.date).toLocaleDateString()}</td>
-                    <td>{expense.category}</td>
-                    <td>{symbol}{expense.amount.toFixed(2)}</td>
-                    <td>{expense.paymentMethod || "Cash"}</td>
-                    <td>{expense.description || "-"}</td>
+                incomes.map(income => (
+                  <tr key={income._id}>
+                    <td>{new Date(income.date).toLocaleDateString()}</td>
+                    <td>{income.source}</td>
+                    <td>{symbol}{income.amount.toFixed(2)}</td>
+                    <td>{income.paymentMethod || "Cash"}</td>
+                    <td>{income.description || "-"}</td>
                     <td className="text-center">
                       <button
-                        className="btn btn-sm btn-warning me-2"
-                        onClick={() => openEditModal(expense)}
-                        title="Edit Expense"
+                        className="btn btn-sm btn-success me-2"
+                        onClick={() => openEditModal(income)}
+                        title="Edit Income"
                       >
                           ✏️ Edit
                       </button>
                       <button
                         className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(expense._id)}
-                        title="Delete Expense"
+                        onClick={() => handleDelete(income._id)}
+                        title="Delete Income"
                       >
                         🗑️ Delete
                       </button>
@@ -392,4 +392,4 @@ const OtherExpenses = () => {
   );
 };
 
-export default OtherExpenses;
+export default OtherIncome;

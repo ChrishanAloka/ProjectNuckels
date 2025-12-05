@@ -1,7 +1,7 @@
 // src/components/Home.jsx
 import React from "react";
 import { Link } from "react-router-dom";
-import LogoImage from "../upload/logo.jpg"; 
+import LogoImage from "../upload/logo.png"; 
 
 
 
@@ -22,7 +22,7 @@ const Home = () => {
           >
             <img
               src={LogoImage}
-              alt="Golden Plus Logo"
+              alt="MPMS Logo"
               style={{
                 width: "100%",
                 height: "100%",
@@ -31,14 +31,14 @@ const Home = () => {
             />
           </div>
         </div>
-        <h1 className="mb-2">Welcome to Golden Plus</h1>
-        <h5 className="mb-3 border-bottom pb-2">Restaurant and Cafe Management System</h5>
+        <h1 className="mb-2">Welcome to MPMS</h1>
+        <h5 className="mb-3 border-bottom pb-2">Multi-Project Management System</h5>
         
         <p className="lead mb-4">Please select your role to continue:</p>
 
         <div className="d-grid gap-3" style={{ maxWidth: "300px", margin: "auto" }}>
-          <Link to="/cashier-login" className="btn btn-outline-primary btn-lg">
-            Cashier Login
+          <Link to="/user-login" className="btn btn-outline-primary btn-lg">
+            User Login
           </Link>
           {/* <Link to="/kitchen-login" className="btn btn-outline-dark btn-lg">
             Kitchen Login
@@ -55,15 +55,15 @@ const Home = () => {
             New user? Sign up as:
           </p>
           <div className="d-grid gap-2" style={{ maxWidth: "300px", margin: "auto" }}>
-            <Link to="/signup?role=cashier" className="btn btn-primary btn-sm">
-              Sign Up as Cashier
+            <Link to="/signup?role=user" className="btn btn-primary btn-sm">
+              Sign Up as User
             </Link>
             {/* <Link to="/signup?role=kitchen" className="btn btn-dark btn-sm">
               Sign Up as Kitchen Staff
             </Link> */}
-            {/* <Link to="/signup?role=admin" className="btn btn-success btn-sm">
+            <Link to="/signup?role=admin" className="btn btn-success btn-sm">
               Sign Up as Admin
-            </Link> */}
+            </Link>
           </div>
         </div>
       </div>

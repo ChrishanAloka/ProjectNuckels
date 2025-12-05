@@ -1,41 +1,43 @@
-// src/components/KitchenLogin.jsx
+// src/components/CashierLogin.jsx
 import React, { useState, useContext } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth-context";
 
-const KitchenLogin = () => {
+const UserLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const res = await axios.post("https://projectnuckels.onrender.com/api/auth/login", {
-        email,
-        password,
-      });
-      const data = res.data;
-
-      if (data.role !== "kitchen") {
-      alert("Unauthorized access");
-      return;
+        const res = await axios.post("https://projectnuckels.onrender.com/api/auth/login", { email, password });
+        const data = res.data;
+    
+        if (data.role !== "user") {
+          alert("Unauthorized access");
+          setLoading(false);
+          return;
+        }
+    
+        login(data); // Comes from useAuth()
+        navigate("/user"); // Redirect after login
+      } catch (err) {
+        alert("Login failed. Please check your credentials.");
+        setLoading(false);
     }
-
-    login(data); // Comes from useAuth()
-    navigate("/kitchen"); // Redirect after login
-  } catch (err) {
-    alert("Login failed. Please check your credentials.");
-  }
   };
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
       <div className="card shadow-sm p-4" style={{ maxWidth: "400px", width: "100%" }}>
-        <h4 className="text-center mb-4">Kitchen Login</h4>
+        <h4 className="text-center mb-4">User Login</h4>
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email address</label>
@@ -47,6 +49,7 @@ const KitchenLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
           <div className="mb-3">
@@ -59,10 +62,22 @@ const KitchenLogin = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
-          <button type="submit" className="btn btn-primary w-100">
-            Login
+          <button
+            type="submit"
+            className="btn btn-primary w-100 d-flex align-items-center justify-content-center"
+            disabled={loading} // 👈 Disable button while loading
+          >
+            {loading ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Logging in...
+              </>
+            ) : (
+              "Login"
+            )}
           </button>
         </form>
 
@@ -70,7 +85,7 @@ const KitchenLogin = () => {
 
         <p className="text-center mb-0">
           Don't have an account?{" "}
-          <Link to="/signup?role=kitchen" className="text-decoration-none">
+          <Link to="/signup?role=user" className="text-decoration-none">
             Sign Up
           </Link>
         </p>
@@ -82,4 +97,4 @@ const KitchenLogin = () => {
   );
 };
 
-export default KitchenLogin;
+export default UserLogin;

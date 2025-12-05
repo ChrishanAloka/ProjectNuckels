@@ -58,6 +58,30 @@ const RoleLayout = () => {
     );
   };
 
+  const LevelIcon = ({ level }) => (
+    <span className="level-icon" style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '25px',
+      height: '20px',
+      fontSize: '20px',
+      fontWeight: 'bold',
+      color: '#4a5568', // matches typical icon color
+      borderRadius: '4px',
+      backgroundColor: '#ffffffff',
+      marginRight: '0px',
+      marginLeft: '-3px'
+    }}>
+      L{level}
+    </span>
+  );
+
+  // Define pseudo-icon components
+  const L1Icon = () => <LevelIcon level={1} />;
+  const L2Icon = () => <LevelIcon level={2} />;
+  const L3Icon = () => <LevelIcon level={3} />;
+
   const renderSidebarMenu = () => {
     switch (user?.role) {
       case "admin":
@@ -122,6 +146,15 @@ const RoleLayout = () => {
             {createMenuItem("/kitchen/attendance/add", "Attendance", FaUserClock)}
           </>
         );
+      case "user":
+        return (
+          <>
+            {createMenuItem("/user", "User Management", FaBookReader)}
+            {createMenuItem("/user/comp-Level1", "Component Level-1", L1Icon)}
+            {createMenuItem("/user/comp-Level2", "Component Level-2", L2Icon)}
+            {createMenuItem("/user/comp-Level3", "Component Level-3", L3Icon)}
+          </>
+        );
       default:
         return null;
     }
@@ -153,7 +186,7 @@ const RoleLayout = () => {
             {isSidebarExpanded && (
               <>
                 <img
-                  src="/logo.jpg"
+                  src="/logo.png"
                   alt="Logo"
                   className="sidebar-logo rounded-circle me-2"
                   style={{
@@ -164,7 +197,7 @@ const RoleLayout = () => {
                     boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
                   }}
                 />
-                <h3 className="justify-content-left sidebar-title mb-0">Gasma Chinese Restaurant-RMS</h3>
+                <h3 className="justify-content-left sidebar-title mb-0">Multi-Project Management System</h3>
               </>
             )}
           </div>

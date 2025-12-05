@@ -6,10 +6,6 @@ import AdminLogin from './components/AdminLogin';
 import CashierLogin from './components/CashierLogin';
 import KitchenLogin from './components/KitchenLogin';
 
-import CashierSignup from "./components/CashierSignup";
-import KitchenSignup from "./components/KitchenSignup";
-import AdminSignup from "./components/AdminSignup";
-
 import Signup from './components/Signup';
 
 import Printersettings from "./components/PrinterSettings";
@@ -72,6 +68,11 @@ import RegisterDriverPage from "./components/RegisterDriverPage";
 import OtherExpenses from "./components/OtherExpenses";
 import OtherIncome from "./components/OtherIncome";
 
+import UserLogin from './components/UserLogin';
+import UserLanding from "./components/UserLanding";
+import ComponentDetailsLevel1 from "./components/ComponentDetailsLevel1";
+import ComponentDetailsLevel2 from "./components/ComponentDetailsLevel2";
+import ComponentDetailsLevel3 from "./components/ComponentDetailsLevel3";
 
 <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -83,12 +84,12 @@ function App() {
       <Route path="/admin-login" element={<AdminLogin />} />
       <Route path="/cashier-login" element={<CashierLogin />} />
       <Route path="/kitchen-login" element={<KitchenLogin />} />
+
+      <Route path="/user-login" element={<UserLogin />} />
+
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
       
-      <Route path="/cashier-signup" element={<CashierSignup />} />
-      <Route path="/kitchen-signup" element={<KitchenSignup />} />
-      <Route path="/admin-signup" element={<AdminSignup />} />
       <Route path="/signup" element={<Signup />} />
       <Route path="/unauthorized" element={<Unauthorized />} />
       
@@ -141,6 +142,7 @@ function App() {
         <Route path="/:role/bills" element={<KitchenBills />} /> 
 
         <Route path="/printer-settings" element={<Printersettings />} />
+        <Route path="/orders/receipt/:id" element={<ReceiptView />} />
 
       </Route>
 
@@ -163,8 +165,19 @@ function App() {
         <Route path="/cashier/other-income" element={<OtherIncome />} />
       </Route>
       
-      <Route path="/cashier/takeaway-orders" element={<TakeawayOrdersPage />} />
-      <Route path="/orders/receipt/:id" element={<ReceiptView />} />
+      <Route
+        element={
+          <ProtectedRoute allowedRoles={["user"]}>
+            <RoleLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route path="/user" element={<UserLanding />} />
+        <Route path="/user/comp-Level1" element={<ComponentDetailsLevel1 />} />
+        <Route path="/user/comp-Level2" element={<ComponentDetailsLevel2 />} />
+        <Route path="/user/comp-Level3" element={<ComponentDetailsLevel3 />} />
+        
+      </Route>
       
     </Routes>
   );

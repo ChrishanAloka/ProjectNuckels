@@ -17,7 +17,7 @@ const CashierLogin = () => {
     e.preventDefault();
     setLoading(true);
     try {
-        const res = await axios.post("https://goldenpluscaferms.onrender.com/api/auth/login", { email, password });
+        const res = await axios.post("https://projectnuckels.onrender.com/api/auth/login", { email, password });
         const data = res.data;
     
         if (data.role !== "cashier") {
@@ -37,7 +37,7 @@ const CashierLogin = () => {
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
       <div className="card shadow-sm p-4" style={{ maxWidth: "400px", width: "100%" }}>
-        <h4 className="text-center mb-4">Cashier Login</h4>
+        <h4 className="text-center mb-4">User Login</h4>
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label htmlFor="email" className="form-label">Email address</label>

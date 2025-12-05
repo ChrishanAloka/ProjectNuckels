@@ -18,7 +18,7 @@ const ResetPassword = () => {
 
     try {
       const res = await axios.post(
-        `https://goldenpluscaferms.onrender.com/api/auth/reset-password/${token}`,
+        `https://projectnuckels.onrender.com/api/auth/reset-password/${token}`,
         {
           newPassword: password
         }
