@@ -4,7 +4,7 @@ const Level2ComponentSchema = new mongoose.Schema({
   code: { type: String, required: true },
   componentName: { type: String, required: true },
   componentDescription: { type: String },
-  estimatedAmount: { type: Number, default: 0, min: 0 },
+  estimatedAmount: { type: Number, default: 0, required: true, min: 0 },
   parentComponent: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Level1Component',
