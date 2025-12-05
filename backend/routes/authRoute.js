@@ -218,9 +218,9 @@ router.put("/expense/other/:id", authMiddleware(["admin", "cashier"]), updateExp
 router.delete("/expense/other/:id", authMiddleware(["admin", "cashier"]), deleteExpense);
 router.get("/expense/other/by-date", authMiddleware(["admin", "cashier"]), getExpensesByDate);
 
-router.get("/", authMiddleware(["admin", "user"]), getComponents);
-router.post("/", authMiddleware(["admin", "user"]),createComponent);
-router.put("/:id", authMiddleware(["admin", "user"]), updateComponent);
-router.delete("/:id", authMiddleware(["admin", "user"]),deleteComponent);
+router.get("/level1component/", authMiddleware(["admin", "user"]), getComponents);
+router.post("/level1component/", authMiddleware(["admin", "user"]),createComponent);
+router.put("/level1component/:id", authMiddleware(["admin", "user"]), updateComponent);
+router.delete("/level1component/:id", authMiddleware(["admin", "user"]),deleteComponent);
 
 module.exports = router;
