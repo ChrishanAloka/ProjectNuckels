@@ -63,6 +63,8 @@ const level1componentcontroller = require('../controllers/level1ComponentControl
 const level2componentcontroller = require('../controllers/level2ComponentController');
 const level3componentcontroller = require('../controllers/level3ComponentController');
 const level4ActivityController = require('../controllers/level4ActivityController');
+const level5ActivityItemsController = require('../controllers/level5ActivityItemsController');
+
 
 // Only admin can manage printers (adjust roles as needed)
 router.get("/printers", authMiddleware(["admin", "kitchen", "cashier"]), getPrinters);
@@ -238,5 +240,11 @@ router.get('/level4activity/parents',  authMiddleware(["admin", "user"]), level4
 router.post('/level4activity/',  authMiddleware(["admin", "user"]), level4ActivityController.createActivity);
 router.put('/level4activity/:id',  authMiddleware(["admin", "user"]), level4ActivityController.updateActivity);
 router.delete('/level4activity/:id',  authMiddleware(["admin", "user"]), level4ActivityController.deleteActivity);
+
+router.get('/level5activityitem/',  authMiddleware(["admin", "user"]), level5ActivityItemsController.getItems);
+router.get('/level5activityitem/parents',  authMiddleware(["admin", "user"]), level5ActivityItemsController.getParentItems);
+router.post('/level5activityitem/',  authMiddleware(["admin", "user"]), level5ActivityItemsController.createItem);
+router.put('/level5activityitem/:id',  authMiddleware(["admin", "user"]), level5ActivityItemsController.updateItem);
+router.delete('/level5activityitem/:id',  authMiddleware(["admin", "user"]), level5ActivityItemsController.deleteItem);
 
 module.exports = router;
