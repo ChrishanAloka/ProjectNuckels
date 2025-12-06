@@ -186,7 +186,7 @@ const ComponentDetails = () => {
               name="code"
               value={newComponent.code}
               onChange={handleChange}
-              placeholder="e.g., CMP-001"
+              placeholder="e.g., C1"
               className="form-control"
               required
             />
@@ -368,22 +368,24 @@ const ComponentDetails = () => {
                     <td>{comp.componentDescription || "—"}</td>
                     <td>{formatNumber(comp.estimatedAmount)}</td>
                     <td className="text-center">
-                      <button
-                        className="btn btn-sm btn-primary me-2"
-                        onClick={() => openEditModal(comp)}
-                        title="Edit Component"
-                        disabled={loading}
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(comp._id)}
-                        title="Delete Component"
-                        disabled={loading}
-                      >
-                        🗑️ Delete
-                      </button>
+                      <div className="d-flex gap-1">
+                        <button
+                          className="btn btn-sm btn-primary me-2"
+                          onClick={() => openEditModal(comp)}
+                          title="Edit Component"
+                          disabled={loading}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDelete(comp._id)}
+                          title="Delete Component"
+                          disabled={loading}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

@@ -1,94 +1,85 @@
-// src/components/Level2ComponentDetails.jsx
+// src/components/Level5ActivityItemsDetails.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-const Level2ComponentDetails = () => {
-  const [subComponents, setSubComponents] = useState([]);
-  const [parentComponents, setParentComponents] = useState([]);
-  const [newSub, setNewSub] = useState({
+const Level5ActivityItemsDetails = () => {
+  const [items, setItems] = useState([]);
+  const [parentItems, setParentItems] = useState([]); // Level 4
+  const [newItem, setNewItem] = useState({
     code: "",
-    componentName: "",
-    componentDescription: "",
-    parentComponent: "",
+    itemName: "",
+    itemDescription: "",
+    parentItem: "",
     estimatedAmount: ""
   });
 
   const [editingId, setEditingId] = useState(null);
-  const [editData, setEditData] = useState({ ...newSub });
+  const [editData, setEditData] = useState({ ...newItem });
   const [loading, setLoading] = useState(false);
 
-  // Load data
   useEffect(() => {
-    fetchSubComponents();
-    fetchParentComponents();
+    fetchItems();
+    fetchParentItems();
   }, []);
 
-  const fetchSubComponents = async () => {
+  const fetchItems = async () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/level2component",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );                                    
-      setSubComponents(res.data);
+      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/level5activityitem", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setItems(res.data);
     } catch (err) {
-      console.error("Failed to load Level 2 components:", err.message);
-      toast.error("Failed to load Level 2 components");
+      console.error("Failed to load Level 5 items:", err.message);
+      toast.error("Failed to load Level 5 items");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchParentComponents = async () => {
+  const fetchParentItems = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/level2component/parents",
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      setParentComponents(res.data);
+      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/level5activityitem/parents", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setParentItems(res.data);
     } catch (err) {
-      console.error("Failed to load Level 1 components:", err.message);
-      toast.error("Failed to load Level 1 components");
+      console.error("Failed to load Level 4 parent items:", err.message);
+      toast.error("Failed to load Level 4 activities");
     }
   };
 
-  // Helper: Calculate used amount for a Level1 component
-  const getUsedAmount = (level1Id) => {
-    return subComponents
-      .filter(sub => sub.parentComponent?._id === level1Id)
-      .reduce((sum, sub) => sum + (Number(sub.estimatedAmount) || 0), 0);
+  const getUsedAmount = (level4Id) => {
+    return items
+      .filter(item => item.parentItem?._id === level4Id)
+      .reduce((sum, item) => sum + (Number(item.estimatedAmount) || 0), 0);
   };
 
-  // Helper: Get remaining balance for a Level1 component
-  const getRemainingAmount = (level1Id) => {
-    const parent = parentComponents.find(p => p._id === level1Id);
+  const getRemainingAmount = (level4Id) => {
+    const parent = parentItems.find(p => p._id === level4Id);
     if (!parent) return 0;
-    const used = getUsedAmount(level1Id);
+    const used = getUsedAmount(level4Id);
     return Math.max(0, (Number(parent.estimatedAmount) || 0) - used);
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewSub({ ...newSub, [name]: value });
-
-    // If parent changes, reset estimatedAmount to avoid invalid value
-    if (name === "parentComponent") {
-      setNewSub(prev => ({ ...prev, estimatedAmount: "", [name]: value }));
+    setNewItem({ ...newItem, [name]: value });
+    if (name === "parentItem") {
+      setNewItem(prev => ({ ...prev, estimatedAmount: "", [name]: value }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const { code, componentName, parentComponent, estimatedAmount } = newSub;
+    const { code, itemName, parentItem, estimatedAmount } = newItem;
 
-    if (!code || !componentName || !parentComponent) {
-      toast.error("Component Code, Name, and Level 1 Component are required");
+    if (!code || !itemName || !parentItem) {
+      toast.error("Item Code, Name, and Level 4 Activity are required");
       return;
     }
 
@@ -98,7 +89,7 @@ const Level2ComponentDetails = () => {
       return;
     }
 
-    const remaining = getRemainingAmount(parentComponent);
+    const remaining = getRemainingAmount(parentItem);
     if (amount > remaining) {
       toast.error(`Amount exceeds remaining balance of $${remaining.toFixed(2)}`);
       return;
@@ -107,52 +98,54 @@ const Level2ComponentDetails = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const payload = {
-        ...newSub,
-        estimatedAmount: amount
-      };
+      const payload = { ...newItem, estimatedAmount: amount };
       const res = await axios.post(
-        "https://projectnuckels.onrender.com/api/auth/level2component",
+        "https://projectnuckels.onrender.com/api/auth/level5activityitem",
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setSubComponents([res.data, ...subComponents]);
-      setNewSub({ code: "", componentName: "", componentDescription: "", parentComponent: "", estimatedAmount: "" });
-      toast.success("Level 2 component added!");
+      setItems([res.data, ...items]);
+      setNewItem({
+        code: "",
+        itemName: "",
+        itemDescription: "",
+        parentItem: "",
+        estimatedAmount: ""
+      });
+      toast.success("Level 5 item added!");
     } catch (err) {
       console.error("Add failed:", err.response?.data || err.message);
-      toast.error(err.response?.data?.error || "Failed to add component");
+      toast.error(err.response?.data?.error || "Failed to add item");
     } finally {
       setLoading(false);
     }
   };
 
-  const openEdit = (sub) => {
-    setEditingId(sub._id);
+  const openEdit = (item) => {
+    setEditingId(item._id);
     setEditData({
-      code: sub.code,
-      componentName: sub.componentName,
-      componentDescription: sub.componentDescription || "",
-      parentComponent: sub.parentComponent?._id || "",
-      estimatedAmount: sub.estimatedAmount || ""
+      code: item.code,
+      itemName: item.itemName,
+      itemDescription: item.itemDescription || "",
+      parentItem: item.parentItem?._id || "",
+      estimatedAmount: item.estimatedAmount || ""
     });
   };
 
   const handleEditChange = (e) => {
     const { name, value } = e.target;
     setEditData({ ...editData, [name]: value });
-
-    if (name === "parentComponent") {
+    if (name === "parentItem") {
       setEditData(prev => ({ ...prev, estimatedAmount: "", [name]: value }));
     }
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
-    const { code, componentName, parentComponent, estimatedAmount } = editData;
+    const { code, itemName, parentItem, estimatedAmount } = editData;
 
-    if (!code || !componentName || !parentComponent) {
-      toast.error("Component Code, Name, and Level 1 Component are required");
+    if (!code || !itemName || !parentItem) {
+      toast.error("All required fields must be filled");
       return;
     }
 
@@ -162,30 +155,25 @@ const Level2ComponentDetails = () => {
       return;
     }
 
-    const remaining = getRemainingAmount(parentComponent);
-    // If editing, subtract the current amount from used total
-    const currentSub = subComponents.find(s => s._id === editingId);
-    const currentAmount = currentSub ? Number(currentSub.estimatedAmount) : 0;
-    const adjustedRemaining = remaining + currentAmount; // Add back current allocation
+    const currentItem = items.find(i => i._id === editingId);
+    const currentAmount = currentItem ? Number(currentItem.estimatedAmount) : 0;
+    const adjustedRemaining = getRemainingAmount(parentItem) + currentAmount;
 
     if (amount > adjustedRemaining) {
-      toast.error(`Amount exceeds remaining balance of $${adjustedRemaining.toFixed(2)}`);
+      toast.error(`Amount exceeds available balance of $${adjustedRemaining.toFixed(2)}`);
       return;
     }
 
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const payload = {
-        ...editData,
-        estimatedAmount: amount
-      };
+      const payload = { ...editData, estimatedAmount: amount };
       const res = await axios.put(
-        `https://projectnuckels.onrender.com/api/auth/level2component/${editingId}`,
+        `https://projectnuckels.onrender.com/api/auth/level5activityitem/${editingId}`,
         payload,
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setSubComponents(subComponents.map(s => s._id === editingId ? res.data : s));
+      setItems(items.map(i => i._id === editingId ? res.data : i));
       setEditingId(null);
       toast.success("Updated!");
     } catch (err) {
@@ -197,15 +185,14 @@ const Level2ComponentDetails = () => {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm("Delete this Level 2 component?")) return;
-
+    if (!window.confirm("Delete this Level 5 item?")) return;
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://projectnuckels.onrender.com/api/auth/level2component/${id}`, {
+      await axios.delete(`https://projectnuckels.onrender.com/api/auth/level5activityitem/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setSubComponents(subComponents.filter(s => s._id !== id));
+      setItems(items.filter(i => i._id !== id));
       if (editingId === id) setEditingId(null);
       toast.success("Deleted");
     } catch (err) {
@@ -216,122 +203,104 @@ const Level2ComponentDetails = () => {
     }
   };
 
-  const getLevel1Label = (parent) => {
+  const getParentLabel = (parent) => {
     if (!parent) return "—";
-    return `${parent.code} - ${parent.componentName}`;
+    return `${parent.code} - ${parent.activityName}`;
   };
-
-  // Format currency helper
-  // const formatCurrency = (num) => {
-  //   if (num == null || isNaN(num)) return "$0.00";
-  //   return `$${Number(num).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  // };
 
   const formatCurrency = (num) => {
     if (num == null || isNaN(num)) return "$0";
-
     const number = Math.abs(Number(num));
     const sign = num < 0 ? "-" : "";
-
-    if (number >= 1_000_000_000) {
-      return `${sign}$${(number / 1_000_000_000).toFixed(2)}B`;
-    }
-    if (number >= 1_000_000) {
-      return `${sign}$${(number / 1_000_000).toFixed(2)}M`;
-    }
-    if (number >= 1_000) {
-      return `${sign}$${(number / 1_000).toFixed(2)}K`;
-    }
+    if (number >= 1_000_000_000) return `${sign}$${(number / 1_000_000_000).toFixed(2)}B`;
+    if (number >= 1_000_000) return `${sign}$${(number / 1_000_000).toFixed(2)}M`;
+    if (number >= 1_000) return `${sign}$${(number / 1_000).toFixed(2)}K`;
     return `${sign}$${number.toFixed(2)}`;
   };
 
   return (
     <div className="container py-4">
-      <h2 className="mb-4 fw-bold text-info border-bottom pb-2">
-        Level 2 - Sub Component Details
+      <h2 className="mb-4 fw-bold text-warning border-bottom pb-2">
+        Level 5 - Activity Items
       </h2>
 
       {/* Add Form */}
       <form onSubmit={handleSubmit} className="p-4 bg-white border rounded shadow-sm mb-5">
         <div className="row g-3">
           <div className="col-md-4">
-            <label className="form-label fw-semibold">Component Code</label>
+            <label className="form-label fw-semibold">Item Code</label>
             <input
               type="text"
               name="code"
-              value={newSub.code}
+              value={newItem.code}
               onChange={handleChange}
               className="form-control"
-              placeholder="e.g., C1.1"
+              placeholder="e.g., C1.1.1.1.1"
               required
             />
           </div>
           <div className="col-md-8">
-            <label className="form-label fw-semibold">Component Name</label>
+            <label className="form-label fw-semibold">Item Name</label>
             <input
               type="text"
-              name="componentName"
-              value={newSub.componentName}
+              name="itemName"
+              value={newItem.itemName}
               onChange={handleChange}
               className="form-control"
-              placeholder="e.g., Concrete Slab"
               required
             />
           </div>
           <div className="col-12">
-            <label className="form-label fw-semibold">Level 1 Component</label>
+            <label className="form-label fw-semibold">Parent Activity (Level 4)</label>
             <select
-              name="parentComponent"
-              value={newSub.parentComponent}
+              name="parentItem"
+              value={newItem.parentItem}
               onChange={handleChange}
               className="form-select"
               required
             >
-              <option value="">-- Select Level 1 Component --</option>
-              {parentComponents.map((p) => (
+              <option value="">-- Select Level 4 Activity --</option>
+              {parentItems.map((p) => (
                 <option key={p._id} value={p._id}>
-                  {p.code} - {p.componentName} ({formatCurrency(p.estimatedAmount)})
+                  {p.code} - {p.activityName} ({formatCurrency(p.estimatedAmount)})
                 </option>
               ))}
             </select>
           </div>
-          {/* Display Remaining Balance */}
-          {newSub.parentComponent && (
+          {newItem.parentItem && (
             <div className="col-12">
               <div className="alert alert-info small">
-                <strong>Available Balance:</strong> {formatCurrency(getRemainingAmount(newSub.parentComponent))}
+                <strong>Available Balance:</strong> {formatCurrency(getRemainingAmount(newItem.parentItem))}
               </div>
             </div>
           )}
-          <div className="col-md-6">
+          <div className="col-md-4">
             <label className="form-label fw-semibold">Estimated Amount ($)</label>
             <input
               type="number"
               name="estimatedAmount"
-              value={newSub.estimatedAmount}
+              value={newItem.estimatedAmount}
               onChange={handleChange}
               className="form-control"
               min="0"
               step="any"
-              placeholder="e.g., 2500.50"
               required
             />
           </div>
           <div className="col-12 mt-3">
             <label className="form-label fw-semibold">Description</label>
             <textarea
-              name="componentDescription"
-              value={newSub.componentDescription}
+              name="itemDescription"
+              value={newItem.itemDescription}
               onChange={handleChange}
               rows="2"
-              placeholder="Brief description..."
               className="form-control"
             />
           </div>
           <div className="col-12 mt-3">
             <button
               type="submit"
-              className="btn btn-info w-100 py-2 fs-5"
+              className="btn btn-warning w-100 py-2 fs-5"
               disabled={loading}
             >
               {loading ? (
@@ -340,7 +309,7 @@ const Level2ComponentDetails = () => {
                   Loading Wait...
                 </>
               ) : (
-                "+ Add Sub Component"
+                "+ Add Item"
               )}
             </button>
           </div>
@@ -356,8 +325,8 @@ const Level2ComponentDetails = () => {
         >
           <div className="modal-dialog">
             <div className="modal-content rounded shadow">
-              <div className="modal-header bg-info text-white">
-                <h5 className="modal-title">Edit Level 2 Sub-Component</h5>
+              <div className="modal-header bg-warning text-white">
+                <h5 className="modal-title">Edit Item</h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
@@ -368,7 +337,7 @@ const Level2ComponentDetails = () => {
               <div className="modal-body">
                 <form onSubmit={handleUpdate}>
                   <div className="mb-3">
-                    <label className="form-label fw-semibold">Component Code</label>
+                    <label className="form-label fw-semibold">Item Code</label>
                     <input
                       type="text"
                       name="code"
@@ -379,41 +348,40 @@ const Level2ComponentDetails = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label fw-semibold">Component Name</label>
+                    <label className="form-label fw-semibold">Item Name</label>
                     <input
                       type="text"
-                      name="componentName"
-                      value={editData.componentName}
+                      name="itemName"
+                      value={editData.itemName}
                       onChange={handleEditChange}
                       className="form-control"
                       required
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label fw-semibold">Level 1 Component</label>
+                    <label className="form-label fw-semibold">Level 4 Activity</label>
                     <select
-                      name="parentComponent"
-                      value={editData.parentComponent}
+                      name="parentItem"
+                      value={editData.parentItem}
                       onChange={handleEditChange}
                       className="form-select"
                       required
                     >
-                      <option value="">-- Select Level 1 Component --</option>
-                      {parentComponents.map((p) => (
+                      <option value="">-- Select Level 4 Activity --</option>
+                      {parentItems.map((p) => (
                         <option key={p._id} value={p._id}>
-                          {p.code} - {p.componentName} ({formatCurrency(p.estimatedAmount)})
+                          {p.code} - {p.activityName} ({formatCurrency(p.estimatedAmount)})
                         </option>
                       ))}
                     </select>
                   </div>
-                  {/* Remaining Balance in Modal */}
-                  {editData.parentComponent && (
+                  {editData.parentItem && (
                     <div className="mb-3">
                       <div className="alert alert-info small">
                         <strong>Available Balance:</strong>{" "}
                         {formatCurrency(
-                          getRemainingAmount(editData.parentComponent) +
-                            (subComponents.find(s => s._id === editingId)?.estimatedAmount || 0)
+                          getRemainingAmount(editData.parentItem) +
+                          (items.find(i => i._id === editingId)?.estimatedAmount || 0)
                         )}
                       </div>
                     </div>
@@ -434,8 +402,8 @@ const Level2ComponentDetails = () => {
                   <div className="mb-3">
                     <label className="form-label fw-semibold">Description</label>
                     <textarea
-                      name="componentDescription"
-                      value={editData.componentDescription}
+                      name="itemDescription"
+                      value={editData.itemDescription}
                       onChange={handleEditChange}
                       rows="2"
                       className="form-control"
@@ -444,7 +412,7 @@ const Level2ComponentDetails = () => {
                   <div className="d-flex gap-2">
                     <button
                       type="submit"
-                      className="btn btn-info flex-grow-1"
+                      className="btn btn-warning flex-grow-1"
                       disabled={loading}
                     >
                       {loading ? (
@@ -466,14 +434,14 @@ const Level2ComponentDetails = () => {
 
       {/* Table */}
       <div className="mt-4">
-        <h4 className="mb-3 text-secondary">🧩 Level 2 Sub-Components</h4>
+        <h4 className="mb-3 text-secondary">🧩 Level 5 Activity Items</h4>
         <div className="table-responsive shadow-sm rounded border">
           <table className="table table-bordered table-striped align-middle mb-0">
             <thead className="table-dark">
               <tr>
                 <th>Code</th>
-                <th>Sub-Component Name</th>
-                <th>Level 1 Component</th>
+                <th>Item Name</th>
+                <th>Level 4 Activity</th>
                 <th>Description</th>
                 <th>Est. Amount ($)</th>
                 <th className="text-center">Actions</th>
@@ -486,34 +454,34 @@ const Level2ComponentDetails = () => {
                     Loading Wait...
                   </td>
                 </tr>
-              ) : subComponents.length === 0 ? (
+              ) : items.length === 0 ? (
                 <tr>
                   <td colSpan="6" className="text-center py-4 text-muted">
-                    No Level 2 components yet
+                    No Level 5 items yet
                   </td>
                 </tr>
               ) : (
-                subComponents.map((sub) => (
-                  <tr key={sub._id}>
-                    <td><code>{sub.code}</code></td>
-                    <td>{sub.componentName}</td>
-                    <td>{getLevel1Label(sub.parentComponent)}</td>
-                    <td>{sub.componentDescription || "—"}</td>
-                    <td>{formatCurrency(sub.estimatedAmount)}</td>
+                items.map((item) => (
+                  <tr key={item._id}>
+                    <td><code>{item.code}</code></td>
+                    <td>{item.itemName}</td>
+                    <td>{getParentLabel(item.parentItem)}</td>
+                    <td>{item.itemDescription || "—"}</td>
+                    <td>{formatCurrency(item.estimatedAmount)}</td>
                     <td className="text-center">
                       <div className="d-flex gap-1">
                         <button
-                          className="btn btn-sm btn-info me-2"
-                          onClick={() => openEdit(sub)}
-                          title="Edit Component"
+                          className="btn btn-sm btn-warning"
+                          onClick={() => openEdit(item)}
+                          title="Edit Item"
                           disabled={loading}
                         >
                           ✏️ Edit
                         </button>
                         <button
                           className="btn btn-sm btn-danger"
-                          onClick={() => handleDelete(sub._id)}
-                          title="Delete Component"
+                          onClick={() => handleDelete(item._id)}
+                          title="Delete Item"
                           disabled={loading}
                         >
                           🗑️ Delete
@@ -533,4 +501,4 @@ const Level2ComponentDetails = () => {
   );
 };
 
-export default Level2ComponentDetails;
+export default Level5ActivityItemsDetails;

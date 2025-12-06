@@ -62,6 +62,7 @@ const { getPrinters, upsertPrinter, deletePrinter } = require("../controllers/pr
 const level1componentcontroller = require('../controllers/level1ComponentController');
 const level2componentcontroller = require('../controllers/level2ComponentController');
 const level3componentcontroller = require('../controllers/level3ComponentController');
+const level4ActivityController = require('../controllers/level4ActivityController');
 
 // Only admin can manage printers (adjust roles as needed)
 router.get("/printers", authMiddleware(["admin", "kitchen", "cashier"]), getPrinters);
@@ -231,5 +232,11 @@ router.get('/level3component/parents', authMiddleware(["admin", "user"]), level3
 router.post('/level3component/', authMiddleware(["admin", "user"]), level3componentcontroller.createComponent);
 router.put('/level3component/:id', authMiddleware(["admin", "user"]), level3componentcontroller.updateComponent);
 router.delete('/level3component/:id', authMiddleware(["admin", "user"]), level3componentcontroller.deleteComponent);
+
+router.get('/level4activity/',  authMiddleware(["admin", "user"]), level4ActivityController.getActivities);
+router.get('/level4activity/parents',  authMiddleware(["admin", "user"]), level4ActivityController.getParentActivities);
+router.post('/level4activity/',  authMiddleware(["admin", "user"]), level4ActivityController.createActivity);
+router.put('/level4activity/:id',  authMiddleware(["admin", "user"]), level4ActivityController.updateActivity);
+router.delete('/level4activity/:id',  authMiddleware(["admin", "user"]), level4ActivityController.deleteActivity);
 
 module.exports = router;

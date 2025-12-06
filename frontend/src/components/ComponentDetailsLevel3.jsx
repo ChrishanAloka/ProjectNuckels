@@ -215,7 +215,7 @@ const Level3ComponentDetails = () => {
   return (
     <div className="container py-4">
       <h2 className="mb-4 fw-bold text-warning border-bottom pb-2">
-        Level 3 - Component Details
+        Level 3 - Activity Details
       </h2>
 
       {/* Add Form */}
@@ -229,6 +229,7 @@ const Level3ComponentDetails = () => {
               value={newComp.code}
               onChange={handleChange}
               className="form-control"
+              placeholder="e.g., C1.1.1 / C1.1.2"
               required
             />
           </div>
@@ -302,7 +303,7 @@ const Level3ComponentDetails = () => {
                   Loading Wait...
                 </>
               ) : (
-                "+ Add Level 3 Component"
+                "+ Add Activity"
               )}
             </button>
           </div>
@@ -319,7 +320,7 @@ const Level3ComponentDetails = () => {
           <div className="modal-dialog">
             <div className="modal-content rounded shadow">
               <div className="modal-header bg-warning text-white">
-                <h5 className="modal-title">Edit Level 3 Component</h5>
+                <h5 className="modal-title">Edit Activity</h5>
                 <button
                   type="button"
                   className="btn-close btn-close-white"
@@ -341,7 +342,7 @@ const Level3ComponentDetails = () => {
                     />
                   </div>
                   <div className="mb-3">
-                    <label className="form-label fw-semibold">Component Name</label>
+                    <label className="form-label fw-semibold">Activity Name</label>
                     <input
                       type="text"
                       name="componentName"
@@ -427,14 +428,14 @@ const Level3ComponentDetails = () => {
 
       {/* Table */}
       <div className="mt-4">
-        <h4 className="mb-3 text-secondary">🧩 Level 3 Components</h4>
+        <h4 className="mb-3 text-secondary">🧩 Level 3 Activities</h4>
         <div className="table-responsive shadow-sm rounded border">
           <table className="table table-bordered table-striped align-middle mb-0">
             <thead className="table-dark">
               <tr>
                 <th>Code</th>
-                <th>Component Name</th>
-                <th>Level 2 Component</th>
+                <th>Activity Name</th>
+                <th>Level 2 Sub Component</th>
                 <th>Description</th>
                 <th>Est. Amount ($)</th>
                 <th className="text-center">Actions</th>
@@ -462,22 +463,24 @@ const Level3ComponentDetails = () => {
                     <td>{comp.componentDescription || "—"}</td>
                     <td>{formatCurrency(comp.estimatedAmount)}</td>
                     <td className="text-center">
-                      <button
-                        className="btn btn-sm btn-warning me-2"
-                        onClick={() => openEdit(comp)}
-                        title="Edit Component"
-                        disabled={loading}
-                      >
-                        ✏️ Edit
-                      </button>
-                      <button
-                        className="btn btn-sm btn-danger"
-                        onClick={() => handleDelete(comp._id)}
-                        title="Delete Component"
-                        disabled={loading}
-                      >
-                        🗑️ Delete
-                      </button>
+                      <div className="d-flex gap-1">
+                        <button
+                          className="btn btn-sm btn-warning me-2"
+                          onClick={() => openEdit(comp)}
+                          title="Edit Component"
+                          disabled={loading}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-danger"
+                          onClick={() => handleDelete(comp._id)}
+                          title="Delete Component"
+                          disabled={loading}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))

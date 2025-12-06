@@ -7,7 +7,7 @@ import {
   FaChartBar, FaUserTie, FaCalendarCheck, FaTruck, FaMoneyBillWave,
   FaMoneyCheckAlt, FaUtensils, FaDollarSign, FaShoppingCart, FaHistory,
   FaBookOpen, FaClipboardList, FaUserCircle, FaPercentage, FaTruckLoading, 
-  FaFirstOrder,FaMotorcycle,FaUserClock,FaCashRegister,FaBookReader,FaCoins,FaWallet,FaPrint,FaUserTag
+  FaFirstOrder,FaMotorcycle,FaUserClock,FaCashRegister,FaBookReader,FaCoins,FaWallet,FaPrint,FaUserTag,
 } from "react-icons/fa";
 import "./Sidebar.css";
 import NotificationCenter from "./NotificationCenter";
@@ -77,10 +77,31 @@ const RoleLayout = () => {
     </span>
   );
 
+  const ActivityIcon = ({ level }) => (
+    <span className="level-icon" style={{
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      width: '30px',
+      height: '20px',
+      fontSize: '20px',
+      fontWeight: 'bold',
+      color: '#4a5568', // matches typical icon color
+      borderRadius: '4px',
+      backgroundColor: '#ffffffff',
+      marginRight: '0px',
+      marginLeft: '-3px'
+    }}>
+      A{level}
+    </span>
+  );
+
   // Define pseudo-icon components
   const L1Icon = () => <LevelIcon level={1} />;
   const L2Icon = () => <LevelIcon level={2} />;
-  const L3Icon = () => <LevelIcon level={3} />;
+  const L3Icon = () => <ActivityIcon level={3} />;
+  const L4Icon = () => <LevelIcon level={4} />;
+  const L5Icon = () => <LevelIcon level={5} />;
 
   const renderSidebarMenu = () => {
     switch (user?.role) {
@@ -150,9 +171,11 @@ const RoleLayout = () => {
         return (
           <>
             {createMenuItem("/user", "User Management", FaBookReader)}
-            {createMenuItem("/user/comp-Level1", "Component Level-1", L1Icon)}
-            {createMenuItem("/user/comp-Level2", "Component Level-2", L2Icon)}
-            {createMenuItem("/user/comp-Level3", "Component Level-3", L3Icon)}
+            {createMenuItem("/user/comp-Level1", "Components", L1Icon)}
+            {createMenuItem("/user/comp-Level2", "Sub-Component ", L2Icon)}
+            {createMenuItem("/user/comp-Level3", "Activities", FaUserTag)}
+            {createMenuItem("/user/comp-Level4", "Sub-Activities", FaUsers)}
+            {createMenuItem("/user/comp-Level5", "Sub-Activity Items", FaCoins)}
           </>
         );
       default:

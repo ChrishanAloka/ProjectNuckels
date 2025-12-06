@@ -73,6 +73,9 @@ import UserLanding from "./components/UserLanding";
 import ComponentDetailsLevel1 from "./components/ComponentDetailsLevel1";
 import ComponentDetailsLevel2 from "./components/ComponentDetailsLevel2";
 import ComponentDetailsLevel3 from "./components/ComponentDetailsLevel3";
+import ComponentDetailsLevel4 from "./components/ComponentDetailsLevel4";
+import ComponentDetailsLevel5 from "./components/ComponentDetailsLevel5";
+
 
 <Route path="/unauthorized" element={<Unauthorized />} />
 
@@ -176,6 +179,8 @@ function App() {
         <Route path="/user/comp-Level1" element={<ComponentDetailsLevel1 />} />
         <Route path="/user/comp-Level2" element={<ComponentDetailsLevel2 />} />
         <Route path="/user/comp-Level3" element={<ComponentDetailsLevel3 />} />
+        <Route path="/user/comp-Level4" element={<ComponentDetailsLevel4 />} />
+        <Route path="/user/comp-Level5" element={<ComponentDetailsLevel5 />} />
         
       </Route>
       
