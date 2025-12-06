@@ -21,6 +21,18 @@ const level5ActivityItemSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
+  unit: {
+    type: String,
+    trim: true
+  },
+  parameter: {
+    type: String,
+    trim: true
+  },
+  institute: {
+    type: String,
+    trim: true
+  },
   parentItem: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Level4Activity',

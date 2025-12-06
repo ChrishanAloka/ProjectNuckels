@@ -47,10 +47,10 @@ exports.getParentItems = async (req, res) => {
 
 // POST /api/auth/level5activityitem
 exports.createItem = async (req, res) => {
-  const { code, itemName, itemDescription, estimatedAmount, parentItem } = req.body;
+  const { code, itemName, itemDescription, estimatedAmount, parentItem, unit, parameter, institute } = req.body;
 
   if (!code || !itemName || !parentItem || estimatedAmount == null) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: 'Code, Item Name, Parent, and Estimated Amount are required' });
   }
 
   const amountNum = Number(estimatedAmount);
@@ -83,6 +83,9 @@ exports.createItem = async (req, res) => {
       itemName,
       itemDescription,
       estimatedAmount: amountNum,
+      unit: unit || "",
+      parameter: parameter || "",
+      institute: institute || "",
       parentItem
     });
 
@@ -101,10 +104,10 @@ exports.createItem = async (req, res) => {
 // PUT /api/auth/level5activityitem/:id
 exports.updateItem = async (req, res) => {
   const { id } = req.params;
-  const { code, itemName, itemDescription, estimatedAmount, parentItem } = req.body;
+  const { code, itemName, itemDescription, estimatedAmount, parentItem, unit, parameter, institute } = req.body;
 
   if (!code || !itemName || !parentItem || estimatedAmount == null) {
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: 'Code, Item Name, Parent, and Estimated Amount are required' });
   }
 
   const amountNum = Number(estimatedAmount);
@@ -154,6 +157,9 @@ exports.updateItem = async (req, res) => {
         itemName,
         itemDescription,
         estimatedAmount: amountNum,
+        unit: unit || "",
+        parameter: parameter || "",
+        institute: institute || "",
         parentItem: newParentId
       },
       { new: true, runValidators: true }

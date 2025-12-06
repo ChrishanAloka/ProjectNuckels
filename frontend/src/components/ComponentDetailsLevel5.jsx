@@ -12,7 +12,10 @@ const Level5ActivityItemsDetails = () => {
     itemName: "",
     itemDescription: "",
     parentItem: "",
-    estimatedAmount: ""
+    estimatedAmount: "",
+    unit: "",
+    parameter: "",
+    institute: ""
   });
 
   const [editingId, setEditingId] = useState(null);
@@ -110,7 +113,10 @@ const Level5ActivityItemsDetails = () => {
         itemName: "",
         itemDescription: "",
         parentItem: "",
-        estimatedAmount: ""
+        estimatedAmount: "",
+        unit: "",
+        parameter: "",
+        institute: ""
       });
       toast.success("Level 5 item added!");
     } catch (err) {
@@ -128,7 +134,10 @@ const Level5ActivityItemsDetails = () => {
       itemName: item.itemName,
       itemDescription: item.itemDescription || "",
       parentItem: item.parentItem?._id || "",
-      estimatedAmount: item.estimatedAmount || ""
+      estimatedAmount: item.estimatedAmount || "",
+      unit: item.unit || "",
+      parameter: item.parameter || "",
+      institute: item.institute || ""
     });
   };
 
@@ -250,6 +259,42 @@ const Level5ActivityItemsDetails = () => {
               required
             />
           </div>
+
+          {/* New Fields */}
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">Unit</label>
+            <input
+              type="text"
+              name="unit"
+              value={newItem.unit}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="e.g., kg, hour, unit"
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">Parameter</label>
+            <input
+              type="text"
+              name="parameter"
+              value={newItem.parameter}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="e.g., Quantity, Volume"
+            />
+          </div>
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">Institute</label>
+            <input
+              type="text"
+              name="institute"
+              value={newItem.institute}
+              onChange={handleChange}
+              className="form-control"
+              placeholder="e.g., Ministry of Health"
+            />
+          </div>
+
           <div className="col-12">
             <label className="form-label fw-semibold">Parent Activity (Level 4)</label>
             <select
@@ -358,6 +403,42 @@ const Level5ActivityItemsDetails = () => {
                       required
                     />
                   </div>
+
+                  {/* New Fields in Edit */}
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Unit</label>
+                    <input
+                      type="text"
+                      name="unit"
+                      value={editData.unit}
+                      onChange={handleEditChange}
+                      className="form-control"
+                      placeholder="e.g., kg, hour"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Parameter</label>
+                    <input
+                      type="text"
+                      name="parameter"
+                      value={editData.parameter}
+                      onChange={handleEditChange}
+                      className="form-control"
+                      placeholder="e.g., Quantity"
+                    />
+                  </div>
+                  <div className="mb-3">
+                    <label className="form-label fw-semibold">Institute</label>
+                    <input
+                      type="text"
+                      name="institute"
+                      value={editData.institute}
+                      onChange={handleEditChange}
+                      className="form-control"
+                      placeholder="e.g., UNICEF"
+                    />
+                  </div>
+
                   <div className="mb-3">
                     <label className="form-label fw-semibold">Level 4 Activity</label>
                     <select
@@ -441,6 +522,9 @@ const Level5ActivityItemsDetails = () => {
               <tr>
                 <th>Code</th>
                 <th>Item Name</th>
+                <th>Unit</th>
+                <th>Parameter</th>
+                <th>Institute</th>
                 <th>Level 4 Activity</th>
                 <th>Description</th>
                 <th>Est. Amount ($)</th>
@@ -450,13 +534,13 @@ const Level5ActivityItemsDetails = () => {
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-4 text-muted">
+                  <td colSpan="9" className="text-center py-4 text-muted">
                     Loading Wait...
                   </td>
                 </tr>
               ) : items.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="text-center py-4 text-muted">
+                  <td colSpan="9" className="text-center py-4 text-muted">
                     No Level 5 items yet
                   </td>
                 </tr>
@@ -465,6 +549,9 @@ const Level5ActivityItemsDetails = () => {
                   <tr key={item._id}>
                     <td><code>{item.code}</code></td>
                     <td>{item.itemName}</td>
+                    <td>{item.unit || "—"}</td>
+                    <td>{item.parameter || "—"}</td>
+                    <td>{item.institute || "—"}</td>
                     <td>{getParentLabel(item.parentItem)}</td>
                     <td>{item.itemDescription || "—"}</td>
                     <td>{formatCurrency(item.estimatedAmount)}</td>
