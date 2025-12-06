@@ -9,12 +9,13 @@ const ComponentDetails = () => {
   const [newComponent, setNewComponent] = useState({
     code: "",
     componentName: "",
-    componentDescription: ""
+    componentDescription: "",
+    estimatedAmount: ""
   });
 
   const [editingComponent, setEditingComponent] = useState(null);
   const [editData, setEditData] = useState({ ...newComponent });
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false); // ✅ Global loading state
 
   // Load all components on mount
   useEffect(() => {
@@ -23,22 +24,23 @@ const ComponentDetails = () => {
 
   const fetchComponents = async () => {
     const token = localStorage.getItem("token");
+    setLoading(true);
     try {
-      const res = await axios.get("https://projectnuckels.onrender.com/api/project/components", {
+      const res = await axios.get("https://projectnuckels.onrender.com/api/auth/level1component", {
         headers: { Authorization: `Bearer ${token}` }
       });
       setComponents(res.data);
     } catch (err) {
       console.error("Failed to load components:", err.message);
       toast.error("Failed to load component records");
+    } finally {
+      setLoading(false); // ✅ Stop loading
     }
   };
 
-  // Handle form input change
   const handleChange = (e) =>
     setNewComponent({ ...newComponent, [e.target.name]: e.target.value });
 
-  // Submit new component
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -48,40 +50,44 @@ const ComponentDetails = () => {
       return;
     }
 
+    setLoading(true); // ✅ Start loading
     try {
       const token = localStorage.getItem("token");
       const res = await axios.post(
-        "https://projectnuckels.onrender.com/api/project/components",
-        newComponent,
+        "https://projectnuckels.onrender.com/api/auth/level1component",
+        {
+          ...newComponent,
+          estimatedAmount: newComponent.estimatedAmount ? Number(newComponent.estimatedAmount) : 0
+        },
         {
           headers: { Authorization: `Bearer ${token}` }
         }
       );
 
       setComponents([res.data, ...components]);
-      setNewComponent({ code: "", componentName: "", componentDescription: "" });
+      setNewComponent({ code: "", componentName: "", componentDescription: "", estimatedAmount: "" });
       toast.success("Component added successfully!");
     } catch (err) {
       console.error("Add failed:", err.response?.data || err.message);
       toast.error("Failed to add component");
+    } finally {
+      setLoading(false); // ✅ Stop loading
     }
   };
 
-  // Open edit modal
   const openEditModal = (component) => {
     setEditingComponent(component._id);
     setEditData({
       code: component.code,
       componentName: component.componentName,
-      componentDescription: component.componentDescription || ""
+      componentDescription: component.componentDescription || "",
+      estimatedAmount: component.estimatedAmount || ""
     });
   };
 
-  // Handle edit input change
   const handleEditChange = (e) =>
     setEditData({ ...editData, [e.target.name]: e.target.value });
 
-  // Save updated component
   const handleUpdate = async (e) => {
     e.preventDefault();
 
@@ -91,11 +97,15 @@ const ComponentDetails = () => {
       return;
     }
 
+    setLoading(true); // ✅ Start loading
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `https://projectnuckels.onrender.com/api/project/components/${editingComponent}`,
-        editData,
+        `https://projectnuckels.onrender.com/api/auth/level1component/${editingComponent}`,
+        {
+          ...editData,
+          estimatedAmount: editData.estimatedAmount ? Number(editData.estimatedAmount) : 0
+        },
         {
           headers: { Authorization: `Bearer ${token}` }
         }
@@ -109,26 +119,55 @@ const ComponentDetails = () => {
     } catch (err) {
       console.error("Update failed:", err.response?.data || err.message);
       toast.error("Failed to update component");
+    } finally {
+      setLoading(false); // ✅ Stop loading
     }
   };
 
-  // Delete a component
   const handleDelete = async (id) => {
     const confirmDelete = window.confirm("Are you sure you want to delete this component?");
     if (!confirmDelete) return;
 
+    setLoading(true); // ✅ Start loading
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`https://projectnuckels.onrender.com/api/project/components/${id}`, {
+      await axios.delete(`https://projectnuckels.onrender.com/api/auth/level1component/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
       setComponents(components.filter((c) => c._id !== id));
+      setEditingComponent(null); // In case modal is open
       toast.success("Component deleted");
     } catch (err) {
       console.error("Delete failed:", err.response?.data || err.message);
       toast.error("Failed to delete component");
+    } finally {
+      setLoading(false); // ✅ Stop loading
     }
+  };
+
+  // Helper: format currency
+  // const formatAmount = (amount) => {
+  //   return amount ? `$${Number(amount).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : "$0.00";
+  // };
+
+  // Helper to format numbers as K, M, B
+  const formatNumber = (num) => {
+    if (num == null || isNaN(num)) return "$0";
+
+    const number = Math.abs(Number(num));
+    const sign = num < 0 ? "-" : "";
+
+    if (number >= 1_000_000_000) {
+      return `${sign}$${(number / 1_000_000_000).toFixed(2)}B`;
+    }
+    if (number >= 1_000_000) {
+      return `${sign}$${(number / 1_000_000).toFixed(2)}M`;
+    }
+    if (number >= 1_000) {
+      return `${sign}$${(number / 1_000).toFixed(2)}K`;
+    }
+    return `${sign}$${number.toFixed(2)}`;
   };
 
   return (
@@ -164,6 +203,19 @@ const ComponentDetails = () => {
               required
             />
           </div>
+          <div className="col-md-4">
+            <label className="form-label fw-semibold">Estimated Amount ($)</label>
+            <input
+              type="number"
+              name="estimatedAmount"
+              value={newComponent.estimatedAmount}
+              onChange={handleChange}
+              placeholder="e.g., 5000"
+              className="form-control"
+              min="0"
+              step="any"
+            />
+          </div>
           <div className="col-12 mt-3">
             <label className="form-label fw-semibold">Description</label>
             <textarea
@@ -176,8 +228,19 @@ const ComponentDetails = () => {
             />
           </div>
           <div className="col-12 mt-3">
-            <button type="submit" className="btn btn-primary w-100 py-2 fs-5">
-              + Add Component
+            <button
+              type="submit"
+              className="btn btn-primary w-100 py-2 fs-5"
+              disabled={loading} // ✅ Disable when loading
+            >
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  Loading Wait...
+                </>
+              ) : (
+                "+ Add Component"
+              )}
             </button>
           </div>
         </div>
@@ -198,6 +261,7 @@ const ComponentDetails = () => {
                   type="button"
                   className="btn-close btn-close-white"
                   onClick={() => setEditingComponent(null)}
+                  disabled={loading}
                 />
               </div>
               <div className="modal-body">
@@ -225,6 +289,18 @@ const ComponentDetails = () => {
                     />
                   </div>
                   <div className="mb-3">
+                    <label className="form-label fw-semibold">Estimated Amount ($)</label>
+                    <input
+                      type="number"
+                      name="estimatedAmount"
+                      value={editData.estimatedAmount}
+                      onChange={handleEditChange}
+                      className="form-control"
+                      min="0"
+                      step="any"
+                    />
+                  </div>
+                  <div className="mb-3">
                     <label className="form-label fw-semibold">Description</label>
                     <textarea
                       name="componentDescription"
@@ -235,15 +311,19 @@ const ComponentDetails = () => {
                     />
                   </div>
                   <div className="d-flex gap-2">
-                    <button type="submit" className="btn btn-primary w-100">
-                      Save Changes
-                    </button>
                     <button
-                      type="button"
-                      className="btn btn-danger"
-                      onClick={() => handleDelete(editingComponent)}
+                      type="submit"
+                      className="btn btn-primary w-100"
+                      disabled={loading}
                     >
-                      Delete
+                      {loading ? (
+                        <>
+                          <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                          Loading Wait...
+                        </>
+                      ) : (
+                        "Save Changes"
+                      )}
                     </button>
                   </div>
                 </form>
@@ -263,29 +343,36 @@ const ComponentDetails = () => {
                 <th>Code</th>
                 <th>Component Name</th>
                 <th>Description</th>
+                <th>Est. Amount ($)</th>
                 <th className="text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              {components.length === 0 ? (
+              {loading ? (
                 <tr>
-                  <td colSpan="4" className="text-center text-muted py-4">
+                  <td colSpan="5" className="text-center text-muted py-4">
+                    Loading Wait...
+                  </td>
+                </tr>
+              ) : components.length === 0 ? (
+                <tr>
+                  <td colSpan="5" className="text-center text-muted py-4">
                     No components defined yet
                   </td>
                 </tr>
               ) : (
                 components.map((comp) => (
                   <tr key={comp._id}>
-                    <td>
-                      <code>{comp.code}</code>
-                    </td>
+                    <td><code>{comp.code}</code></td>
                     <td>{comp.componentName}</td>
-                    <td>{comp.componentDescription || "—"} </td>
+                    <td>{comp.componentDescription || "—"}</td>
+                    <td>{formatNumber(comp.estimatedAmount)}</td>
                     <td className="text-center">
                       <button
                         className="btn btn-sm btn-primary me-2"
                         onClick={() => openEditModal(comp)}
                         title="Edit Component"
+                        disabled={loading}
                       >
                         ✏️ Edit
                       </button>
@@ -293,6 +380,7 @@ const ComponentDetails = () => {
                         className="btn btn-sm btn-danger"
                         onClick={() => handleDelete(comp._id)}
                         title="Delete Component"
+                        disabled={loading}
                       >
                         🗑️ Delete
                       </button>
