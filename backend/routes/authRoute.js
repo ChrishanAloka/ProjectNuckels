@@ -64,6 +64,7 @@ const level2componentcontroller = require('../controllers/level2ComponentControl
 const level3componentcontroller = require('../controllers/level3ComponentController');
 const level4ActivityController = require('../controllers/level4ActivityController');
 const level5ActivityItemsController = require('../controllers/level5ActivityItemsController');
+const ActivityItemsMarkProgressController = require('../controllers/ActivityItemsMarkProgressController');
 
 
 // Only admin can manage printers (adjust roles as needed)
@@ -246,5 +247,9 @@ router.get('/level5activityitem/parents',  authMiddleware(["admin", "user"]), le
 router.post('/level5activityitem/',  authMiddleware(["admin", "user"]), level5ActivityItemsController.createItem);
 router.put('/level5activityitem/:id',  authMiddleware(["admin", "user"]), level5ActivityItemsController.updateItem);
 router.delete('/level5activityitem/:id',  authMiddleware(["admin", "user"]), level5ActivityItemsController.deleteItem);
+
+router.post('/activityitemsmarkprogress/', authMiddleware(["admin", "user"]), ActivityItemsMarkProgressController.markProgress);
+router.get('/activityitemsmarkprogress/by-item/:itemId', authMiddleware(["admin", "user"]), ActivityItemsMarkProgressController.getProgressByItem);
+router.get('/activityitemsmarkprogress/', authMiddleware(["admin", "user"]), ActivityItemsMarkProgressController.getAllProgress); // optional
 
 module.exports = router;
