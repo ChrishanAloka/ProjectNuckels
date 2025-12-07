@@ -244,6 +244,7 @@ router.delete('/level4activity/:id',  authMiddleware(["admin", "user"]), level4A
 
 router.get('/level5activityitem/',  authMiddleware(["admin", "user"]), level5ActivityItemsController.getItems);
 router.get('/level5activityitem/parents',  authMiddleware(["admin", "user"]), level5ActivityItemsController.getParentItems);
+router.get('/level5activityitem/:id', authMiddleware(["admin", "user"]), level5ActivityItemsController.getItemById);
 router.post('/level5activityitem/',  authMiddleware(["admin", "user"]), level5ActivityItemsController.createItem);
 router.put('/level5activityitem/:id',  authMiddleware(["admin", "user"]), level5ActivityItemsController.updateItem);
 router.delete('/level5activityitem/:id',  authMiddleware(["admin", "user"]), level5ActivityItemsController.deleteItem);

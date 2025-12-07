@@ -69,7 +69,7 @@ import OtherExpenses from "./components/OtherExpenses";
 import OtherIncome from "./components/OtherIncome";
 
 import UserLogin from './components/UserLogin';
-import UserLanding from "./components/UserLanding";
+import MarkProgress from "./components/MarkProgress";
 import ComponentDetailsLevel1 from "./components/ComponentDetailsLevel1";
 import ComponentDetailsLevel2 from "./components/ComponentDetailsLevel2";
 import ComponentDetailsLevel3 from "./components/ComponentDetailsLevel3";
@@ -175,7 +175,7 @@ function App() {
           </ProtectedRoute>
         }
       >
-        <Route path="/user" element={<UserLanding />} />
+        <Route path="/user" element={<MarkProgress />} />
         <Route path="/user/comp-Level1" element={<ComponentDetailsLevel1 />} />
         <Route path="/user/comp-Level2" element={<ComponentDetailsLevel2 />} />
         <Route path="/user/comp-Level3" element={<ComponentDetailsLevel3 />} />

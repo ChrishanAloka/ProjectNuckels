@@ -45,6 +45,25 @@ exports.getParentItems = async (req, res) => {
   }
 };
 
+// GET /api/auth/level5activityitem/:id
+exports.getItemById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const item = await Level5ActivityItem.findById(id)
+      .populate('parentItem', 'code activityName estimatedAmount');
+
+    if (!item) {
+      return res.status(404).json({ error: 'Level 5 item not found' });
+    }
+
+    res.json(item);
+  } catch (err) {
+    console.error('Failed to fetch Level 5 item by ID:', err.message);
+    res.status(500).json({ error: 'Failed to load item details' });
+  }
+};
+
 // POST /api/auth/level5activityitem
 exports.createItem = async (req, res) => {
   const { code, itemName, itemDescription, estimatedAmount, parentItem, unit, parameter, institute } = req.body;

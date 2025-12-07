@@ -170,7 +170,7 @@ const RoleLayout = () => {
       case "user":
         return (
           <>
-            {createMenuItem("/user", "User Management", FaBookReader)}
+            {createMenuItem("/user", "Mark Progress", FaBookReader)}
             {createMenuItem("/user/comp-Level1", "Components", L1Icon)}
             {createMenuItem("/user/comp-Level2", "Sub-Component ", L2Icon)}
             {createMenuItem("/user/comp-Level3", "Activities", FaUserTag)}

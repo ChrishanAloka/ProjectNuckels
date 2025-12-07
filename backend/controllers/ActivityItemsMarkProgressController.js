@@ -15,6 +15,8 @@ const getCurrentProgress = async (itemId) => {
 exports.markProgress = async (req, res) => {
   const {
     activityItem,
+    level4Activity,     // 👈 Now expected from frontend
+    level3Component,    // 👈 Now expected from frontend
     fromDate,
     toDate,
     physicalProgressDescription,
@@ -23,8 +25,19 @@ exports.markProgress = async (req, res) => {
     financialProgressPercentage
   } = req.body;
 
+  console.log("activityItem ",activityItem, " level4Activity ",level4Activity, " level3Component ",level3Component);
+
   // Validation
-  if (!activityItem || !fromDate || !toDate || physicalProgressPercentage == null || financialProgressPercentage == null || financialProgressAmount == null) {
+  if (
+    !activityItem ||
+    !level4Activity ||
+    !level3Component ||
+    !fromDate ||
+    !toDate ||
+    physicalProgressPercentage == null ||
+    financialProgressPercentage == null ||
+    financialProgressAmount == null
+  ) {
     return res.status(400).json({ error: 'All fields are required' });
   }
 
@@ -47,33 +60,44 @@ exports.markProgress = async (req, res) => {
   }
 
   try {
-    // Step 1: Fetch the Level 5 item
-    const item = await Level5ActivityItem.findById(activityItem).populate('parentItem', '_id parentItem');
+    // 🔍 Validate Level 5 item exists and matches the hierarchy
+    const item = await Level5ActivityItem.findById(activityItem);
     if (!item) {
-      return res.status(404).json({ error: 'Level 5 activity item not found' });
+      return res.status(404).json({ error: 'Level 5 item not found' });
     }
 
-    // Step 2: Extract Level 4 and Level 3
-    const level4Activity = item.parentItem; // This is a Level4Activity object
-    if (!level4Activity) {
-      return res.status(404).json({ error: 'Level 4 parent not found for this item' });
+    // Optional: Double-check that the provided IDs match the actual hierarchy
+    // (Good for security if users could manipulate requests)
+    // ✅ Safe: Check existence before .toString()
+    if (!item.parentItem) {
+    return res.status(400).json({ error: 'Level 5 item has no parent Level 4 activity' });
     }
 
-    // Level 4's parent is Level 3 (stored as `parentItem` in Level4Activity model)
-    const level4Populated = await Level4Activity.findById(level4Activity._id).populate('parentItem', '_id');
-    const level3Component = level4Populated?.parentItem;
-    if (!level3Component) {
-      return res.status(404).json({ error: 'Level 3 grandparent not found' });
+    if (item.parentItem.toString() !== level4Activity) {
+    return res.status(400).json({ error: 'Level 5 item does not belong to the selected Level 4 activity' });
     }
 
-    // Step 3: Validate financial amount against Level 5 item's budget
+    const level4 = await Level4Activity.findById(level4Activity);
+    if (!level4) {
+    return res.status(400).json({ error: 'Selected Level 4 activity not found' });
+    }
+
+    if (!level4.parentActivity) {
+    return res.status(400).json({ error: 'Level 4 activity has no parent Level 3 component' });
+    }
+
+    if (level4.parentActivity.toString() !== level3Component) {
+    return res.status(400).json({ error: 'Level 4 activity does not belong to the selected Level 3 component' });
+    }
+
+    // Optional: Validate financial amount ≤ item budget
     if (financialAmt > item.estimatedAmount) {
       return res.status(400).json({
         error: `Financial amount ($${financialAmt}) exceeds item's total budget ($${item.estimatedAmount})`
       });
     }
 
-    // Step 4: Check cumulative progress for this Level 5 item
+    // Check cumulative progress
     const existingEntries = await ActivityItemsMarkProgress.find({ activityItem }).lean();
     const totalPhysical = existingEntries.reduce((sum, p) => sum + (p.physicalProgressPercentage || 0), 0);
     const totalFinancial = existingEntries.reduce((sum, p) => sum + (p.financialProgressPercentage || 0), 0);
@@ -89,11 +113,11 @@ exports.markProgress = async (req, res) => {
       });
     }
 
-    // Step 5: Create progress record with full hierarchy
+    // ✅ Save with explicitly provided hierarchy IDs
     const newProgress = new ActivityItemsMarkProgress({
-      activityItem: item._id,
-      level4Activity: level4Activity._id,
-      level3Component: level3Component._id,
+      activityItem,
+      level4Activity,
+      level3Component,
       fromDate: new Date(fromDate),
       toDate: new Date(toDate),
       physicalProgressDescription: physicalProgressDescription || "",
@@ -104,11 +128,12 @@ exports.markProgress = async (req, res) => {
 
     const saved = await newProgress.save();
 
-    // Populate all references for response
-    const populated = await saved
-      .populate('activityItem', 'code itemName estimatedAmount')
-      .populate('level4Activity', 'code activityName')
-      .populate('level3Component', 'code componentName');
+    // Use Model.populate (static method)
+    const populated = await ActivityItemsMarkProgress.populate(saved, [
+    { path: 'activityItem', select: 'code itemName' },
+    { path: 'level4Activity', select: 'code activityName' },
+    { path: 'level3Component', select: 'code componentName' }
+    ]);
 
     res.status(201).json(populated);
   } catch (err) {
